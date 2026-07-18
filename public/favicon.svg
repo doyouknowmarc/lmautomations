@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">lmautomations — Liam and Marc Automations</title>
+  <rect width="64" height="64" rx="14" fill="#000000"/>
+  <path d="M10 13h8v31h12v7H10V13Z" fill="#E1E0CC"/>
+  <path d="M32 13h8l6 16 6-16h8v38h-8V30l-4 12h-4l-4-12v21h-8V13Z" fill="#E1E0CC"/>
+</svg>

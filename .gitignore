@@ -13,6 +13,9 @@ dist/
 coverage/
 *.tsbuildinfo
 
+# Local agent tooling (per-machine settings, dev-server launch config)
+.claude/
+
 # Editor and operating-system files
 .DS_Store
 .idea/

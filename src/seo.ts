@@ -22,6 +22,7 @@ const IMPRINT_METADATA: PageMetadata = {
   description:
     'Company and legal information for Liam & Marc Automations, including the registered business address and Belgian VAT identification details.',
   canonicalPath: '/imprint.html',
+  robots: 'noindex, follow',
 }
 
 const NOT_FOUND_METADATA: PageMetadata = {

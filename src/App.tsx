@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import Hero from './components/Hero'
 import About from './components/About'
 import Features from './components/Features'
+import Preloader from './components/Preloader'
 import { usePageMetadata } from './seo'
 
 const BASE_URL = import.meta.env.BASE_URL
@@ -26,6 +27,7 @@ function SiteFooter() {
 
 export default function App() {
   const [path, setPath] = useState(() => normalizePath(window.location.pathname))
+  const [preloaderDone, setPreloaderDone] = useState(false)
 
   usePageMetadata(path)
 
@@ -45,6 +47,7 @@ export default function App() {
 
   return (
     <>
+      {!preloaderDone && <Preloader onComplete={() => setPreloaderDone(true)} />}
       <a href="#main-content" className="skip-link">Skip to content</a>
       <div className="flex min-h-[100dvh] flex-col bg-black">
         <main id="main-content">

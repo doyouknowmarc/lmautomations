@@ -16,6 +16,14 @@ export function createVideoScrubber(video: HTMLVideoElement): VideoScrubber {
   const renderFrame = () => {
     if (!isStarted) return
 
+    // Never stack a new seek on top of one still in flight. Desktop decoders
+    // land seeks within a frame so this changes nothing there, but on mobile
+    // (especially Android) unthrottled writes queue up and cause visible lag.
+    if (video.seeking) {
+      animationFrame = window.requestAnimationFrame(renderFrame)
+      return
+    }
+
     const distance = targetTime - video.currentTime
     if (Math.abs(distance) > SETTLE_THRESHOLD) {
       video.currentTime += distance * SEEK_EASING
@@ -54,6 +62,9 @@ export function createVideoScrubber(video: HTMLVideoElement): VideoScrubber {
     stop: () => {
       isStarted = false
       window.cancelAnimationFrame(animationFrame)
+      // Reset the frame handle, otherwise scheduleRender() thinks a frame is
+      // still pending after a stop/start cycle and the render loop never resumes.
+      animationFrame = 0
       video.pause()
     },
   }

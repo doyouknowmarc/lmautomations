@@ -52,62 +52,7 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script id="structured-data" type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "Organization",
-            "@id": "https://lmautomations.com/#organization",
-            "name": "lmautomations",
-            "alternateName": "Liam & Marc Automations",
-            "url": "https://lmautomations.com/",
-            "description": "Custom AI automation systems, intelligent agents, and secure enterprise AI solutions.",
-            "logo": { "@id": "https://lmautomations.com/#logo" },
-            "image": { "@id": "https://lmautomations.com/#primaryimage" },
-            "knowsAbout": ["AI automation", "AI agents", "Workflow automation", "Enterprise AI"]
-          },
-          {
-            "@type": "ImageObject",
-            "@id": "https://lmautomations.com/#logo",
-            "url": "https://lmautomations.com/apple-touch-icon.png",
-            "contentUrl": "https://lmautomations.com/apple-touch-icon.png",
-            "width": 180,
-            "height": 180,
-            "caption": "Liam & Marc Automations"
-          },
-          {
-            "@type": "ImageObject",
-            "@id": "https://lmautomations.com/#primaryimage",
-            "url": "https://lmautomations.com/liam-marc-automations-og.jpg",
-            "contentUrl": "https://lmautomations.com/liam-marc-automations-og.jpg",
-            "width": 1200,
-            "height": 630,
-            "caption": "Liam & Marc Automations, custom AI automation systems"
-          },
-          {
-            "@type": "WebSite",
-            "@id": "https://lmautomations.com/#website",
-            "url": "https://lmautomations.com/",
-            "name": "lmautomations",
-            "publisher": { "@id": "https://lmautomations.com/#organization" },
-            "inLanguage": "en"
-          },
-          {
-            "@type": "WebPage",
-            "@id": "https://lmautomations.com/#webpage",
-            "url": "https://lmautomations.com/",
-            "name": "AI Automations | Liam & Marc",
-            "description": "Liam and Marc build secure custom AI automations and intelligent agents that reduce manual work, streamline operations, and deliver measurable business results.",
-            "isPartOf": { "@id": "https://lmautomations.com/#website" },
-            "about": { "@id": "https://lmautomations.com/#organization" },
-            "primaryImageOfPage": { "@id": "https://lmautomations.com/#primaryimage" },
-            "inLanguage": "en",
-            "datePublished": "2026-07-18",
-            "dateModified": "2026-07-24"
-          }
-        ]
-      }
-    </script>
+    <!-- Filled in per route by scripts/prerender.mjs from src/seo.ts; the client refreshes it on navigation. -->
+    <script id="structured-data" type="application/ld+json"></script>
   </body>
 </html>

@@ -36,20 +36,7 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script id="structured-data" type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        "@id": "https://lmautomations.com/imprint/#webpage",
-        "url": "https://lmautomations.com/imprint/",
-        "name": "Imprint and Legal Information | Liam & Marc Automations",
-        "description": "Company and legal information for Liam & Marc Automations, including the registered business address and Belgian VAT identification details.",
-        "isPartOf": { "@id": "https://lmautomations.com/#website" },
-        "about": { "@id": "https://lmautomations.com/#organization" },
-        "inLanguage": "en",
-        "datePublished": "2026-07-18",
-        "dateModified": "2026-07-24"
-      }
-    </script>
+    <!-- Filled in per route by scripts/prerender.mjs from src/seo.ts; the client refreshes it on navigation. -->
+    <script id="structured-data" type="application/ld+json"></script>
   </body>
 </html>

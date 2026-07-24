@@ -1,6 +1,7 @@
 import { ReactNode, useRef } from 'react'
 import { motion, useInView, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import { ArrowRight, Check } from 'lucide-react'
+import { SERVICE_TIERS, ServiceTier } from '../content/services'
 import { WordsPullUpMultiStyle } from './animations'
 
 const CARD_EASE = [0.22, 1, 0.36, 1] as const
@@ -51,39 +52,7 @@ function TiltCard({ children, className = '' }: { children: ReactNode; className
   )
 }
 
-interface FeatureCardData {
-  title: string
-  price: string
-  number: string
-  items: string[]
-  bookingUrl: string
-}
-
-const FEATURE_CARDS: FeatureCardData[] = [
-  {
-    title: 'Small Projects.',
-    price: 'Up to €10,000',
-    number: '01',
-    items: ['AI chatbots and custom assistants', 'Lead, CRM and outreach automation', 'Workflow and productivity tools'],
-    bookingUrl: 'https://tidycal.com/doyouknowmarc/ai-automation-discovery-call-small-project',
-  },
-  {
-    title: 'Growth Projects.',
-    price: 'Up to €30,000',
-    number: '02',
-    items: ['Agentic automation systems', 'Sales, support and knowledge AI', 'CRM, ERP and document pipelines'],
-    bookingUrl: 'https://tidycal.com/doyouknowmarc/ai-automation-discovery-call-growth-project',
-  },
-  {
-    title: 'Enterprise & Custom.',
-    price: '€30,000+',
-    number: '03',
-    items: ['Secure private-cloud deployments', 'Custom LLM platforms and integrations', 'Architecture, strategy and long-term support'],
-    bookingUrl: 'https://tidycal.com/doyouknowmarc/ai-automation-discovery-call-custom-project',
-  },
-]
-
-function FeatureCard({ card }: { card: FeatureCardData }) {
+function FeatureCard({ card }: { card: ServiceTier }) {
   return (
     <div className="bg-[#212121] rounded-2xl p-5 sm:p-6 lg:p-7 flex flex-col h-full ring-1 ring-white/[0.06] transition-all duration-300 hover:bg-[#272725] hover:ring-[#E1E0CC]/25 hover:shadow-[0_12px_48px_-16px_rgba(225,224,204,0.18)]">
       <p className="text-[#DEDBC8]/50 text-xs tracking-widest">{card.number}</p>
@@ -180,7 +149,7 @@ export default function Features() {
             </TiltCard>
           </motion.div>
 
-          {FEATURE_CARDS.map((card, index) => (
+          {SERVICE_TIERS.map((card, index) => (
             <motion.div key={card.title} {...cardMotion(index + 1)} className="h-full">
               <TiltCard>
                 <FeatureCard card={card} />

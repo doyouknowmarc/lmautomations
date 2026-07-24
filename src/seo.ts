@@ -1,11 +1,20 @@
 import { useEffect } from 'react'
 import { FAQ_ITEMS } from './content/faq'
+import { SERVICE_TIERS } from './content/services'
 
 export const SITE_URL = 'https://lmautomations.com'
 const SOCIAL_IMAGE = `${SITE_URL}/liam-marc-automations-og.jpg`
+// The general enquiry booking link, as used by the hero call to action.
+const BOOKING_URL = 'https://tidycal.com/doyouknowmarc/ai-discovery-call'
 
-// Bump DATE_MODIFIED whenever page content changes; keep in sync with the
-// matching JSON-LD hardcoded into index.html / imprint/index.html / faq/index.html.
+// Public profile URLs (LinkedIn, Instagram, YouTube, GitHub, X) that let search
+// engines tie this Organization to a known entity. Listing one here is inert: a
+// sameAs entry is a plain string in JSON-LD, so it loads no third-party resource
+// and sets no cookie — unlike an embedded widget, it needs no consent banner.
+const SAME_AS: string[] = []
+
+// Bump DATE_MODIFIED whenever page content changes. This module is the only
+// source of the JSON-LD: scripts/prerender.mjs injects it into the built HTML.
 const DATE_PUBLISHED = '2026-07-18'
 const DATE_MODIFIED = '2026-07-24'
 export const LAST_UPDATED_DISPLAY = 'July 24, 2026'
@@ -56,6 +65,49 @@ function upsertMeta(selector: string, attribute: 'name' | 'property', key: strin
   element.content = content
 }
 
+// The three tiers as an offer catalog. Services are modelled as Service inside
+// Offer rather than as Product: Google's product rich results only cover pages
+// focused on a single purchasable product, and these are price ranges for
+// consulting engagements with no checkout.
+function createOfferCatalog() {
+  return {
+    '@type': 'OfferCatalog',
+    '@id': `${SITE_URL}/#offercatalog`,
+    name: 'AI automation projects',
+    itemListElement: SERVICE_TIERS.map((tier) => ({
+      '@type': 'Offer',
+      name: tier.serviceName,
+      url: tier.bookingUrl,
+      priceSpecification: {
+        '@type': 'PriceSpecification',
+        priceCurrency: 'EUR',
+        ...(tier.minPrice === undefined ? {} : { minPrice: tier.minPrice }),
+        ...(tier.maxPrice === undefined ? {} : { maxPrice: tier.maxPrice }),
+      },
+      itemOffered: {
+        '@type': 'Service',
+        name: tier.serviceName,
+        description: tier.serviceDescription,
+        serviceType: 'AI automation',
+        provider: { '@id': `${SITE_URL}/#organization` },
+      },
+    })),
+  }
+}
+
+// Home → page trail. Breadcrumbs are the one rich result still rendered by
+// Google among the markup on this site.
+function createBreadcrumb(path: string, name: string) {
+  return {
+    '@type': 'BreadcrumbList',
+    '@id': `${SITE_URL}${path}#breadcrumb`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name, item: `${SITE_URL}${path}` },
+    ],
+  }
+}
+
 function createHomeSchema() {
   return {
     '@context': 'https://schema.org',
@@ -65,11 +117,30 @@ function createHomeSchema() {
         '@id': `${SITE_URL}/#organization`,
         name: 'lmautomations',
         alternateName: 'Liam & Marc Automations',
+        legalName: 'Liam Ryngaert',
         url: `${SITE_URL}/`,
         description: 'Custom AI automation systems, intelligent agents, and secure enterprise AI solutions.',
         logo: { '@id': `${SITE_URL}/#logo` },
         image: { '@id': `${SITE_URL}/#primaryimage` },
+        vatID: 'BE1012768189',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Houthulststraat 59',
+          postalCode: '2170',
+          addressLocality: 'Merksem',
+          addressCountry: 'BE',
+        },
+        founder: { '@type': 'Person', name: 'Liam Ryngaert' },
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'sales',
+          url: BOOKING_URL,
+          availableLanguage: 'en',
+        },
+        areaServed: { '@type': 'Place', name: 'Worldwide' },
         knowsAbout: ['AI automation', 'AI agents', 'Workflow automation', 'Enterprise AI'],
+        hasOfferCatalog: createOfferCatalog(),
+        ...(SAME_AS.length === 0 ? {} : { sameAs: SAME_AS }),
       },
       {
         '@type': 'ImageObject',
@@ -117,41 +188,66 @@ function createHomeSchema() {
 function createImprintSchema() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    '@id': `${SITE_URL}/imprint/#webpage`,
-    url: `${SITE_URL}/imprint/`,
-    name: IMPRINT_METADATA.title,
-    description: IMPRINT_METADATA.description,
-    isPartOf: { '@id': `${SITE_URL}/#website` },
-    about: { '@id': `${SITE_URL}/#organization` },
-    inLanguage: 'en',
-    datePublished: DATE_PUBLISHED,
-    dateModified: DATE_MODIFIED,
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${SITE_URL}/imprint/#webpage`,
+        url: `${SITE_URL}/imprint/`,
+        name: IMPRINT_METADATA.title,
+        description: IMPRINT_METADATA.description,
+        isPartOf: { '@id': `${SITE_URL}/#website` },
+        about: { '@id': `${SITE_URL}/#organization` },
+        breadcrumb: { '@id': `${SITE_URL}/imprint/#breadcrumb` },
+        inLanguage: 'en',
+        datePublished: DATE_PUBLISHED,
+        dateModified: DATE_MODIFIED,
+      },
+      // The imprint is noindexed, so this trail never surfaces as a rich
+      // result; it is here so every page carries the same shape.
+      createBreadcrumb('/imprint/', 'Imprint'),
+    ],
   }
 }
 
+// FAQPage, not QAPage: these answers are written by the site with no way for
+// visitors to submit their own, which Google's QAPage guidelines exclude.
 function createFaqSchema() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `${SITE_URL}/faq/#faq`,
-    url: `${SITE_URL}/faq/`,
-    name: FAQ_METADATA.title,
-    description: FAQ_METADATA.description,
-    isPartOf: { '@id': `${SITE_URL}/#website` },
-    about: { '@id': `${SITE_URL}/#organization` },
-    inLanguage: 'en',
-    datePublished: DATE_PUBLISHED,
-    dateModified: DATE_MODIFIED,
-    mainEntity: FAQ_ITEMS.map((item) => ({
-      '@type': 'Question',
-      name: item.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: [item.intro, ...(item.bullets ?? []), item.answer].filter(Boolean).join(' '),
+    '@graph': [
+      {
+        '@type': 'FAQPage',
+        '@id': `${SITE_URL}/faq/#faq`,
+        url: `${SITE_URL}/faq/`,
+        name: FAQ_METADATA.title,
+        description: FAQ_METADATA.description,
+        isPartOf: { '@id': `${SITE_URL}/#website` },
+        about: { '@id': `${SITE_URL}/#organization` },
+        breadcrumb: { '@id': `${SITE_URL}/faq/#breadcrumb` },
+        inLanguage: 'en',
+        datePublished: DATE_PUBLISHED,
+        dateModified: DATE_MODIFIED,
+        mainEntity: FAQ_ITEMS.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: [item.intro, ...(item.bullets ?? []), item.answer].filter(Boolean).join(' '),
+          },
+        })),
       },
-    })),
+      createBreadcrumb('/faq/', 'FAQ'),
+    ],
   }
+}
+
+// Single source of the page JSON-LD, consumed by usePageMetadata at runtime and
+// by scripts/prerender.mjs at build time (re-exported via src/entry-server.tsx).
+export function schemaForPath(path: string): Record<string, unknown> | null {
+  if (path === '/') return createHomeSchema()
+  if (path === '/imprint') return createImprintSchema()
+  if (path === '/faq') return createFaqSchema()
+  return null
 }
 
 export function usePageMetadata(path: string) {
@@ -174,13 +270,8 @@ export function usePageMetadata(path: string) {
 
     const schema = document.getElementById('structured-data')
     if (schema) {
-      schema.textContent = path === '/'
-        ? JSON.stringify(createHomeSchema())
-        : path === '/imprint'
-          ? JSON.stringify(createImprintSchema())
-          : path === '/faq'
-            ? JSON.stringify(createFaqSchema())
-            : ''
+      const pageSchema = schemaForPath(path)
+      schema.textContent = pageSchema ? JSON.stringify(pageSchema) : ''
     }
   }, [path])
 }

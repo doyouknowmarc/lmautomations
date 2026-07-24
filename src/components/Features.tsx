@@ -168,7 +168,6 @@ export default function Features() {
                       height="941"
                       loading="lazy"
                       decoding="async"
-                      fetchPriority="low"
                       className="absolute inset-0 h-full w-full object-cover"
                     />
                   </picture>

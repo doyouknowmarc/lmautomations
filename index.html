@@ -29,7 +29,7 @@
     <meta property="og:image" content="https://lmautomations.com/liam-marc-automations-og.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Liam &amp; Marc Automations — custom AI automation systems" />
+    <meta property="og:image:alt" content="Liam &amp; Marc Automations, custom AI automation systems" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="AI Automations | Liam &amp; Marc" />
@@ -38,10 +38,16 @@
       content="Liam and Marc build secure custom AI automations and intelligent agents that reduce manual work, streamline operations, and deliver measurable business results."
     />
     <meta name="twitter:image" content="https://lmautomations.com/liam-marc-automations-og.jpg" />
-    <meta name="twitter:image:alt" content="Liam &amp; Marc Automations — custom AI automation systems" />
+    <meta name="twitter:image:alt" content="Liam &amp; Marc Automations, custom AI automation systems" />
     <link rel="preload" href="%BASE_URL%liam-marc-video-poster.webp" as="image" type="image/webp" fetchpriority="high" />
     <link rel="preload" href="%BASE_URL%fonts/poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="%BASE_URL%fonts/poppins-500-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Without JS the preloader never reveals, so hide it and show the prerendered content underneath. -->
+    <noscript>
+      <style>
+        .preloader-root { display: none !important; }
+      </style>
+    </noscript>
   </head>
   <body>
     <div id="root"></div>
@@ -77,7 +83,7 @@
             "contentUrl": "https://lmautomations.com/liam-marc-automations-og.jpg",
             "width": 1200,
             "height": 630,
-            "caption": "Liam & Marc Automations — custom AI automation systems"
+            "caption": "Liam & Marc Automations, custom AI automation systems"
           },
           {
             "@type": "WebSite",
@@ -96,7 +102,9 @@
             "isPartOf": { "@id": "https://lmautomations.com/#website" },
             "about": { "@id": "https://lmautomations.com/#organization" },
             "primaryImageOfPage": { "@id": "https://lmautomations.com/#primaryimage" },
-            "inLanguage": "en"
+            "inLanguage": "en",
+            "datePublished": "2026-07-18",
+            "dateModified": "2026-07-24"
           }
         ]
       }

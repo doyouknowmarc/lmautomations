@@ -1,32 +1,36 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Hero from './components/Hero'
 import About from './components/About'
 import Features from './components/Features'
 import Preloader from './components/Preloader'
-import { usePageMetadata } from './seo'
+import Imprint from './components/Imprint'
+import FAQPage from './components/FAQ'
+import NotFound from './components/NotFound'
+import { LAST_UPDATED_DISPLAY, usePageMetadata } from './seo'
 
 const BASE_URL = import.meta.env.BASE_URL
-
-const Imprint = lazy(() => import('./components/Imprint'))
-const NotFound = lazy(() => import('./components/NotFound'))
 
 function SiteFooter() {
   return (
     <footer className="bg-black px-4 md:px-6">
       <div className="mx-auto flex max-w-7xl items-center justify-between border-t border-white/10 py-6 text-[10px] text-[#DEDBC8]/55 sm:text-xs md:py-7">
-        <p>lmautomations <span className="hidden sm:inline">— Focused systems. Measurable outcomes.</span></p>
+        <p>
+          lmautomations <span className="hidden sm:inline">· Focused systems. Measurable outcomes.</span>{' '}
+          <span className="text-[#DEDBC8]/40">· Last updated {LAST_UPDATED_DISPLAY}</span>
+        </p>
         <nav aria-label="Footer navigation" className="flex items-center gap-4 sm:gap-6">
           <a href={`${BASE_URL}#about`} className="transition-colors duration-200 hover:text-[#E1E0CC]">About</a>
           <a href={`${BASE_URL}#solutions`} className="transition-colors duration-200 hover:text-[#E1E0CC]">Solutions</a>
-          <a href={`${BASE_URL}imprint.html`} className="transition-colors duration-200 hover:text-[#E1E0CC]">Imprint</a>
+          <a href={`${BASE_URL}faq/`} className="transition-colors duration-200 hover:text-[#E1E0CC]">FAQ</a>
+          <a href={`${BASE_URL}imprint/`} className="transition-colors duration-200 hover:text-[#E1E0CC]">Imprint</a>
         </nav>
       </div>
     </footer>
   )
 }
 
-export default function App() {
-  const [path, setPath] = useState(() => normalizePath(window.location.pathname))
+export default function App({ url }: { url?: string }) {
+  const [path, setPath] = useState(() => resolveInitialPath(url))
   const [preloaderDone, setPreloaderDone] = useState(false)
 
   usePageMetadata(path)
@@ -37,13 +41,9 @@ export default function App() {
     return () => window.removeEventListener('popstate', handleNavigation)
   }, [])
 
-  if (path === '/imprint') {
-    return <Suspense fallback={<RouteFallback />}><Imprint /></Suspense>
-  }
-
-  if (path !== '/') {
-    return <Suspense fallback={<RouteFallback />}><NotFound /></Suspense>
-  }
+  if (path === '/imprint') return <Imprint />
+  if (path === '/faq') return <FAQPage />
+  if (path !== '/') return <NotFound />
 
   return (
     <>
@@ -61,6 +61,14 @@ export default function App() {
   )
 }
 
+// On the server the route comes in as a prop; on the client it's read from the
+// URL (falling back to the URL only when the prop is absent).
+function resolveInitialPath(url?: string) {
+  if (url != null) return normalizePath(url)
+  if (typeof window !== 'undefined') return normalizePath(window.location.pathname)
+  return '/'
+}
+
 function normalizePath(path: string) {
   const basePath = BASE_URL.replace(/\/$/, '')
   const pathWithoutBase = basePath && path.startsWith(basePath) ? path.slice(basePath.length) || '/' : path
@@ -68,8 +76,4 @@ function normalizePath(path: string) {
     ? '/'
     : pathWithoutBase.replace(/\.html$/, '')
   return normalizedPath.length > 1 ? normalizedPath.replace(/\/+$/, '') : normalizedPath
-}
-
-function RouteFallback() {
-  return <div className="min-h-[100dvh] bg-[#101010]" aria-busy="true" aria-label="Loading page" />
 }

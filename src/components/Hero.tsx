@@ -289,7 +289,7 @@ export default function Hero() {
           <div className="grid grid-cols-12 gap-5 md:gap-8 items-end">
             <div className="col-span-12 lg:col-span-8 overflow-visible">
               <h1 id="hero-title" className="sr-only">
-                Liam and Marc Automations — custom AI automation systems
+                Liam and Marc Automations, custom AI automation systems
               </h1>
               <motion.div
                 aria-hidden="true"
@@ -315,7 +315,7 @@ export default function Hero() {
                 We build custom AI automations and intelligent agents that eliminate manual work, streamline operations, and accelerate business growth.
               </p>
               <a
-                href={`https://tidycal.com/doyouknowmarc/ai-automation-discovery-call-60-minutes`}
+                href={`https://tidycal.com/doyouknowmarc/ai-discovery-call`}
                 rel="noopener noreferrer"
                 target="_blank"
                 className="group bg-primary rounded-full flex items-center gap-2 hover:gap-3 active:translate-y-px pl-5 pr-1.5 py-1.5 text-black font-medium text-sm sm:text-base transition-all"

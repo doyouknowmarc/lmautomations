@@ -14,7 +14,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && vite build --ssr src/entry-server.tsx --outDir .prerender-tmp && node scripts/prerender.mjs",
     "preview": "vite preview",
     "check:deployment": "npm run build && node scripts/check-deployment.mjs"
   },

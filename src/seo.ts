@@ -1,7 +1,14 @@
 import { useEffect } from 'react'
+import { FAQ_ITEMS } from './content/faq'
 
 export const SITE_URL = 'https://lmautomations.com'
 const SOCIAL_IMAGE = `${SITE_URL}/liam-marc-automations-og.jpg`
+
+// Bump DATE_MODIFIED whenever page content changes; keep in sync with the
+// matching JSON-LD hardcoded into index.html / imprint/index.html / faq/index.html.
+const DATE_PUBLISHED = '2026-07-18'
+const DATE_MODIFIED = '2026-07-24'
+export const LAST_UPDATED_DISPLAY = 'July 24, 2026'
 
 interface PageMetadata {
   title: string
@@ -21,8 +28,15 @@ const IMPRINT_METADATA: PageMetadata = {
   title: 'Imprint and Legal Information | Liam & Marc Automations',
   description:
     'Company and legal information for Liam & Marc Automations, including the registered business address and Belgian VAT identification details.',
-  canonicalPath: '/imprint.html',
+  canonicalPath: '/imprint/',
   robots: 'noindex, follow',
+}
+
+const FAQ_METADATA: PageMetadata = {
+  title: 'FAQ | Liam & Marc Automations',
+  description:
+    'Answers to common questions about our custom AI automation services, project timelines, target customers, and team at Liam & Marc Automations.',
+  canonicalPath: '/faq/',
 }
 
 const NOT_FOUND_METADATA: PageMetadata = {
@@ -73,7 +87,7 @@ function createHomeSchema() {
         contentUrl: SOCIAL_IMAGE,
         width: 1200,
         height: 630,
-        caption: 'Liam & Marc Automations — custom AI automation systems',
+        caption: 'Liam & Marc Automations, custom AI automation systems',
       },
       {
         '@type': 'WebSite',
@@ -93,6 +107,8 @@ function createHomeSchema() {
         about: { '@id': `${SITE_URL}/#organization` },
         primaryImageOfPage: { '@id': `${SITE_URL}/#primaryimage` },
         inLanguage: 'en',
+        datePublished: DATE_PUBLISHED,
+        dateModified: DATE_MODIFIED,
       },
     ],
   }
@@ -102,19 +118,45 @@ function createImprintSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    '@id': `${SITE_URL}/imprint.html#webpage`,
-    url: `${SITE_URL}/imprint.html`,
+    '@id': `${SITE_URL}/imprint/#webpage`,
+    url: `${SITE_URL}/imprint/`,
     name: IMPRINT_METADATA.title,
     description: IMPRINT_METADATA.description,
     isPartOf: { '@id': `${SITE_URL}/#website` },
     about: { '@id': `${SITE_URL}/#organization` },
     inLanguage: 'en',
+    datePublished: DATE_PUBLISHED,
+    dateModified: DATE_MODIFIED,
+  }
+}
+
+function createFaqSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `${SITE_URL}/faq/#faq`,
+    url: `${SITE_URL}/faq/`,
+    name: FAQ_METADATA.title,
+    description: FAQ_METADATA.description,
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    about: { '@id': `${SITE_URL}/#organization` },
+    inLanguage: 'en',
+    datePublished: DATE_PUBLISHED,
+    dateModified: DATE_MODIFIED,
+    mainEntity: FAQ_ITEMS.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: [item.intro, ...(item.bullets ?? []), item.answer].filter(Boolean).join(' '),
+      },
+    })),
   }
 }
 
 export function usePageMetadata(path: string) {
   useEffect(() => {
-    const metadata = path === '/' ? HOME_METADATA : path === '/imprint' ? IMPRINT_METADATA : NOT_FOUND_METADATA
+    const metadata = path === '/' ? HOME_METADATA : path === '/imprint' ? IMPRINT_METADATA : path === '/faq' ? FAQ_METADATA : NOT_FOUND_METADATA
     const canonicalUrl = `${SITE_URL}${metadata.canonicalPath}`
 
     document.title = metadata.title
@@ -132,7 +174,13 @@ export function usePageMetadata(path: string) {
 
     const schema = document.getElementById('structured-data')
     if (schema) {
-      schema.textContent = path === '/' ? JSON.stringify(createHomeSchema()) : path === '/imprint' ? JSON.stringify(createImprintSchema()) : ''
+      schema.textContent = path === '/'
+        ? JSON.stringify(createHomeSchema())
+        : path === '/imprint'
+          ? JSON.stringify(createImprintSchema())
+          : path === '/faq'
+            ? JSON.stringify(createFaqSchema())
+            : ''
     }
   }, [path])
 }

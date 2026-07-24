@@ -172,7 +172,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
         }
 
   return (
-    <>
+    <div className="preloader-root">
       {/* Accent halves: briefly visible in the widening center gap, then follow the doors out. */}
       <motion.div
         aria-hidden="true"
@@ -239,6 +239,6 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           </p>
         </div>
       </motion.div>
-    </>
+    </div>
   )
 }

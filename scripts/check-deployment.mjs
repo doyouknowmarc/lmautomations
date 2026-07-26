@@ -127,7 +127,7 @@ check(videoNames.length === 2, 'responsive mobile and desktop hero videos are bu
 check(videoNames.length > 0 && (await Promise.all(videoNames.map((name) => bytes(`dist/assets/${name}`)))).every((size) => size < 4_000_000), 'each hero video is below the 4 MB launch budget')
 check(Boolean(mainJsName) && (await bytes(`dist/assets/${mainJsName}`)) < 350_000, 'initial JavaScript is below the 350 KB launch budget')
 check(Boolean(mainCssName) && (await bytes(`dist/assets/${mainCssName}`)) < 25_000, 'CSS is below the 25 KB launch budget')
-check((await bytes('dist/liam-marc-team-1672.webp')) < 200_000, 'largest responsive team image is below 200 KB')
+check((await bytes('dist/liam-marc-footer-941.webp')) < 200_000, 'largest responsive team image is below 200 KB')
 
 if (failures.length) {
   console.error(`\n${failures.length} deployment check(s) failed:`)

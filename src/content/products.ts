@@ -25,6 +25,6 @@ export const PRODUCTS: Product[] = [
     title: 'AI Companion Apps',
     description: 'We design and build branded AI companions tailored to your audience, whether for ChatGPT or another platform.',
     imageAlt: 'Branded AI companion pet built as a custom ChatGPT app',
-    href: 'https://tidycal.com/doyouknowmarc/ai-companion',
+    href: 'https://tidycal.com/lmautomations/ai-companion',
   },
 ]

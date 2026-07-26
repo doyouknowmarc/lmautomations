@@ -6,7 +6,7 @@ import { SERVICE_TIERS } from './content/services'
 export const SITE_URL = 'https://lmautomations.com'
 const SOCIAL_IMAGE = `${SITE_URL}/liam-marc-automations-og.jpg`
 // The general enquiry booking link, as used by the hero call to action.
-const BOOKING_URL = 'https://tidycal.com/doyouknowmarc/ai-discovery-call'
+const BOOKING_URL = 'https://tidycal.com/lmautomations/ai-discovery-call'
 
 // Public profile URLs (LinkedIn, Instagram, YouTube, GitHub, X) that let search
 // engines tie this Organization to a known entity. Listing one here is inert: a

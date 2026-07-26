@@ -94,7 +94,7 @@ export default function FAQPage() {
 
         <div className="mt-10 flex">
           <a
-            href="https://tidycal.com/doyouknowmarc/ai-discovery-call"
+            href="https://tidycal.com/lmautomations/ai-discovery-call"
             target="_blank"
             rel="noreferrer"
             className="group flex items-center gap-2 text-primary text-sm active:translate-y-px"

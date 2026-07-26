@@ -308,7 +308,7 @@ export default function Hero() {
                 We build custom AI automations and intelligent agents that eliminate manual work, streamline operations, and accelerate business growth.
               </p>
               <a
-                href={`https://tidycal.com/doyouknowmarc/ai-discovery-call`}
+                href={`https://tidycal.com/lmautomations/ai-discovery-call`}
                 rel="noopener noreferrer"
                 target="_blank"
                 className="group bg-primary rounded-full flex items-center gap-2 hover:gap-3 active:translate-y-px pl-5 pr-1.5 py-1.5 text-black font-medium text-sm sm:text-base transition-all"

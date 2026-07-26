@@ -10,10 +10,6 @@ const CARD_EASE = [0.22, 1, 0.36, 1] as const
 // Kept small so it reads as a material response, not a gimmick.
 const CARD_MAX_TILT_DEG = 5
 
-// The image's ambient zoom: how far it drifts in and how long one leg takes.
-const IMAGE_ZOOM_SCALE = 1.08
-const IMAGE_ZOOM_DURATION_S = 10
-
 // Follows the cursor with a springy 3D tilt. Purely presentational — pointer
 // tracking is local, and reduced-motion users get a static card.
 function TiltCard({ children, className = '' }: { children: ReactNode; className?: string }) {
@@ -118,29 +114,26 @@ export default function Features() {
           <motion.div {...cardMotion(0)} className="h-full min-h-[320px]">
             <TiltCard>
               <div className="group relative rounded-2xl overflow-hidden h-full min-h-[320px] ring-1 ring-white/[0.06] transition-shadow duration-300 hover:ring-[#E1E0CC]/25 hover:shadow-[0_12px_48px_-16px_rgba(225,224,204,0.18)]">
-                {/* Ambient zoom: the photo slowly drifts in and back out so the card feels alive. */}
-                <motion.div
-                  className="absolute inset-0"
-                  animate={shouldReduceMotion ? undefined : { scale: [1, IMAGE_ZOOM_SCALE] }}
-                  transition={{ duration: IMAGE_ZOOM_DURATION_S, ease: 'easeInOut', repeat: Infinity, repeatType: 'mirror' }}
-                >
-                  <picture>
-                    <source
-                      type="image/webp"
-                      srcSet={`${import.meta.env.BASE_URL}liam-marc-footer-480.webp 480w, ${import.meta.env.BASE_URL}liam-marc-footer-720.webp 720w, ${import.meta.env.BASE_URL}liam-marc-footer-941.webp 941w`}
-                      sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
-                    />
-                    <img
-                      src={`${import.meta.env.BASE_URL}liam-marc-footer-720.webp`}
-                      alt="Liam and Marc working together on AI automation projects"
-                      width="941"
-                      height="1672"
-                      loading="lazy"
-                      decoding="async"
-                      className="absolute inset-0 h-full w-full object-cover object-top md:object-center transition-[filter] duration-500 group-hover:saturate-[1.15] group-hover:contrast-[1.05]"
-                    />
-                  </picture>
-                </motion.div>
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet={`${import.meta.env.BASE_URL}liam-marc-footer-480.webp 480w, ${import.meta.env.BASE_URL}liam-marc-footer-720.webp 720w, ${import.meta.env.BASE_URL}liam-marc-footer-941.webp 941w`}
+                    sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                  />
+                  <img
+                    src={`${import.meta.env.BASE_URL}liam-marc-footer-720.webp`}
+                    alt="Liam and Marc working together on AI automation projects"
+                    width="941"
+                    height="1672"
+                    loading="lazy"
+                    decoding="async"
+                    /* object-top at every width, not just below md. The faces sit in the
+                       upper third of a 941x1672 portrait crop, so anchoring to the centre
+                       cropped them off wherever the card is shorter than it is tall —
+                       most visibly on an iPad in portrait, which lands on the md layout. */
+                    className="absolute inset-0 h-full w-full object-cover object-top transition-[filter] duration-500 group-hover:saturate-[1.15] group-hover:contrast-[1.05]"
+                  />
+                </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
                 <p className="absolute bottom-5 left-5 sm:bottom-6 sm:left-6 text-lg sm:text-xl" style={{ color: '#E1E0CC' }}>
                   Keep it simple,<br /> make it work.

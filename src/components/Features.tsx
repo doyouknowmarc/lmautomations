@@ -127,14 +127,14 @@ export default function Features() {
                   <picture>
                     <source
                       type="image/webp"
-                      srcSet={`${import.meta.env.BASE_URL}liam-marc-team-640.webp 640w, ${import.meta.env.BASE_URL}liam-marc-team-1024.webp 1024w, ${import.meta.env.BASE_URL}liam-marc-team-1672.webp 1672w`}
+                      srcSet={`${import.meta.env.BASE_URL}liam-marc-footer-480.webp 480w, ${import.meta.env.BASE_URL}liam-marc-footer-720.webp 720w, ${import.meta.env.BASE_URL}liam-marc-footer-941.webp 941w`}
                       sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                     />
                     <img
-                      src={`${import.meta.env.BASE_URL}liam-marc-team-1024.webp`}
+                      src={`${import.meta.env.BASE_URL}liam-marc-footer-720.webp`}
                       alt="Liam and Marc working together on AI automation projects"
-                      width="1672"
-                      height="941"
+                      width="941"
+                      height="1672"
                       loading="lazy"
                       decoding="async"
                       className="absolute inset-0 h-full w-full object-cover"

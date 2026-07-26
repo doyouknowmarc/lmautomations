@@ -3,7 +3,6 @@ import { motion, useMotionValue, useReducedMotion, useTransform } from 'framer-m
 import { ArrowRight } from 'lucide-react'
 import { createVideoScrubber } from './video-scrubber'
 import liamMarcVideo from '../assets/liam-marc-video-optimized.mp4'
-import liamMarcMobileVideo from '../assets/liam-marc-video-mobile.mp4'
 
 // ============================================================================
 // CONFIGURABLE VIDEO SCRUBBING & PARALLAX SETTINGS
@@ -35,7 +34,13 @@ const CONTENT_INITIAL_OPACITY = 0
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 
-export default function Hero() {
+interface HeroProps {
+  /** Set once the preloader has finished its own fetch of the same file. Until then the
+   *  video only takes metadata, so the two never download the mp4 concurrently. */
+  fullyBuffer?: boolean
+}
+
+export default function Hero({ fullyBuffer = false }: HeroProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const shouldReduceMotion = useReducedMotion()
@@ -156,22 +161,34 @@ export default function Hero() {
     // live viewport, so a collapsing URL bar would grow this section mid-gesture and
     // shove every following section down under the user's finger.
     <section ref={sectionRef} aria-labelledby="hero-title" className={`${shouldReduceMotion ? 'h-[100svh]' : 'h-[200svh]'} bg-black p-4 md:p-6`}>
-      {/* The card itself stays on dvh so it keeps filling the screen as the toolbar
-          collapses. Its height is not in flow (the parent's height is explicit), so
-          resizing it cannot move the page. */}
-      <div className="sticky top-4 md:top-6 h-[calc(100dvh-2rem)] md:h-[calc(100dvh-3rem)] w-full rounded-2xl md:rounded-[2rem] overflow-hidden">
+      {/* svh here too, not dvh. dvh tracks the visual viewport, so on Android Chrome the
+          card physically grew and shrank every time the URL bar animated — visible as the
+          video resizing mid-scroll, and each resize re-laid out the video, recomputed its
+          object-cover scale and re-rasterised the rounded clip. A constant height costs a
+          band of page background below the card once the toolbar hides; that reads as
+          deliberate padding on an already-inset rounded card. */}
+      <div className="sticky top-4 md:top-6 h-[calc(100svh-2rem)] md:h-[calc(100svh-3rem)] w-full rounded-2xl md:rounded-[2rem] overflow-hidden">
         <video
           ref={videoRef}
           muted
           playsInline
-          preload={shouldReduceMotion ? 'none' : 'metadata'}
+          /* auto once the preloader is out of the way: seeking into an unbuffered range makes
+             every scrub hop pay a buffer/parse cost on top of the decode, which is what makes
+             Android stutter. Held at metadata until then so this element and the preloader's
+             own fetch never pull the same 3 MB file concurrently — by the time it flips, the
+             bytes are warm in the HTTP cache and buffering costs no extra network. */
+          preload={shouldReduceMotion ? 'none' : fullyBuffer ? 'auto' : 'metadata'}
           poster={`${import.meta.env.BASE_URL}liam-marc-video-poster.webp`}
           width="1280"
           height="720"
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src={liamMarcMobileVideo} type="video/mp4" media="(max-width: 767px)" />
+          {/* One encode for every device. The old 854x480 mobile source looked blocky on
+              phones: the card is portrait, so object-cover crops the sides and only ~32%
+              of the encoded pixels ever reached the screen — under 1 MB of a 3 MB file was
+              doing any work. This encode is GOP 6 rather than all-intra, so seeks cost
+              roughly two thirds more; that is the deliberate trade for the picture. */}
           <source src={liamMarcVideo} type="video/mp4" />
         </video>
         {/* Hidden outright on phones rather than merely un-blended: mix-blend-mode over a

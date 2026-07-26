@@ -45,7 +45,9 @@ export default function App({ url }: { url?: string }) {
       <a href="#main-content" className="skip-link">Skip to content</a>
       <div className="flex min-h-[100svh] flex-col bg-black">
         <main id="main-content">
-          <Hero />
+          {/* Hero holds off full buffering until the preloader's own fetch is done, so the
+              same 3 MB mp4 is never downloaded by two media elements at once. */}
+          <Hero fullyBuffer={preloaderDone} />
           <ServicesGrid />
           <Features />
         </main>

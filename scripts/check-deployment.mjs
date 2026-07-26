@@ -123,7 +123,9 @@ check(cssSource.includes('font-display: swap'), 'self-hosted fonts use font-disp
 const videoNames = assetNames.filter((name) => name.endsWith('.mp4'))
 const mainJsName = assetNames.find((name) => /^main-.*\.js$/.test(name))
 const mainCssName = assetNames.find((name) => /^main-.*\.css$/.test(name))
-check(videoNames.length === 2, 'responsive mobile and desktop hero videos are built')
+// One encode serves every device: the phone card is portrait, so a lower-resolution
+// "mobile" cut lost most of its pixels to the object-cover crop and looked blocky.
+check(videoNames.length === 1, 'the single hero video encode is built')
 check(videoNames.length > 0 && (await Promise.all(videoNames.map((name) => bytes(`dist/assets/${name}`)))).every((size) => size < 4_000_000), 'each hero video is below the 4 MB launch budget')
 check(Boolean(mainJsName) && (await bytes(`dist/assets/${mainJsName}`)) < 350_000, 'initial JavaScript is below the 350 KB launch budget')
 check(Boolean(mainCssName) && (await bytes(`dist/assets/${mainCssName}`)) < 25_000, 'CSS is below the 25 KB launch budget')

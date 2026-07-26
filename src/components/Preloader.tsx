@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import liamMarcVideo from '../assets/liam-marc-video-optimized.mp4'
-import liamMarcMobileVideo from '../assets/liam-marc-video-mobile.mp4'
 
 // ============================================================================
 // PRELOADER SETTINGS
@@ -98,11 +97,11 @@ export default function Preloader({ onComplete }: PreloaderProps) {
     let cancelled = false
     const startedAt = performance.now()
 
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
     const tasks: Promise<unknown>[] = [
       preloadFonts(),
       preloadImage(`${import.meta.env.BASE_URL}liam-marc-video-poster.webp`),
-      preloadVideo(isMobile ? liamMarcMobileVideo : liamMarcVideo),
+      // One encode for every device now — see the note on <source> in Hero.tsx.
+      preloadVideo(liamMarcVideo),
     ]
 
     let settled = 0

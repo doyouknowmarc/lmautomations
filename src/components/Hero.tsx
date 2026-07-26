@@ -261,7 +261,7 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} aria-labelledby="hero-title" className={`${shouldReduceMotion ? 'h-[100dvh]' : 'h-[200dvh]'} bg-black p-4 md:p-6`}>
-      <div className="sticky top-4 md:top-6 relative h-[calc(100dvh-2rem)] md:h-[calc(100dvh-3rem)] w-full rounded-2xl md:rounded-[2rem] overflow-hidden">
+      <div className="sticky top-4 md:top-6 h-[calc(100dvh-2rem)] md:h-[calc(100dvh-3rem)] w-full rounded-2xl md:rounded-[2rem] overflow-hidden">
         <video
           ref={videoRef}
           muted
@@ -276,14 +276,7 @@ export default function Hero() {
           <source src={liamMarcMobileVideo} type="video/mp4" media="(max-width: 767px)" />
           <source src={liamMarcVideo} type="video/mp4" />
         </video>
-        {/* Fade-in from black overlay */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0 }}
-          className="absolute inset-0 bg-black pointer-events-none z-10"
-        />
         <div className="absolute inset-0 noise-overlay opacity-[0.45] mix-blend-overlay pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/75" />
 
         <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-6 md:px-10 pb-6 md:pb-10">
           <div className="grid grid-cols-12 gap-5 md:gap-8 items-end">

@@ -62,7 +62,7 @@ function FeatureCard({ card }: { card: ServiceTier }) {
         {card.items.map((item) => (
           <li key={item} className="flex items-start gap-2.5">
             <Check className="text-primary w-4 h-4 mt-0.5 shrink-0" />
-            <span className="text-gray-400 text-xs sm:text-sm">{item}</span>
+            <span className="text-[#DEDBC8]/70 text-xs sm:text-sm">{item}</span>
           </li>
         ))}
       </ul>
@@ -108,8 +108,8 @@ export default function Features() {
             id="solutions-heading"
             className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-normal max-w-3xl"
             segments={[
-              { text: 'Solutions built for your stage of growth.', className: 'text-primary' },
-              { text: 'Focused systems. Measurable outcomes.', className: 'text-gray-500' },
+              { text: 'Want us on your project?', className: 'text-primary' },
+              { text: 'We solve your problems with AI, automation, and custom software.', className: 'text-[#DEDBC8]/50' },
             ]}
           />
         </div>
@@ -143,7 +143,7 @@ export default function Features() {
                 </motion.div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
                 <p className="absolute bottom-5 left-5 sm:bottom-6 sm:left-6 text-lg sm:text-xl" style={{ color: '#E1E0CC' }}>
-                  Built for the work that moves your business forward.
+                  Keep it simple,<br /> make it work.
                 </p>
               </div>
             </TiltCard>

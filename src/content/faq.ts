@@ -35,7 +35,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     bullets: [
       'Small Projects (up to €10,000): up to 2 weeks',
       'Growth Projects (up to €30,000): up to 2 months',
-      'Enterprise & Custom (€30,000+): no longer than 6 months',
+      'Custom (from €5,000): coaching, advisory and speaking, scheduled around your calendar',
     ],
   },
   {

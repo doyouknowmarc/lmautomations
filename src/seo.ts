@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { FAQ_ITEMS } from './content/faq'
+import { PRODUCTS } from './content/products'
 import { SERVICE_TIERS } from './content/services'
 
 export const SITE_URL = 'https://lmautomations.com'
@@ -16,8 +17,8 @@ const SAME_AS: string[] = []
 // Bump DATE_MODIFIED whenever page content changes. This module is the only
 // source of the JSON-LD: scripts/prerender.mjs injects it into the built HTML.
 const DATE_PUBLISHED = '2026-07-18'
-const DATE_MODIFIED = '2026-07-24'
-export const LAST_UPDATED_DISPLAY = 'July 24, 2026'
+const DATE_MODIFIED = '2026-07-26'
+export const LAST_UPDATED_DISPLAY = 'July 26, 2026'
 
 interface PageMetadata {
   title: string
@@ -29,7 +30,7 @@ interface PageMetadata {
 const HOME_METADATA: PageMetadata = {
   title: 'AI Automations | Liam & Marc',
   description:
-    'Liam and Marc build secure custom AI automations and intelligent agents that reduce manual work, streamline operations, and deliver measurable business results.',
+    'Liam and Marc build custom AI automations, agents and 3D visualization systems that cut manual work and deliver measurable results for your business.',
   canonicalPath: '/',
 }
 
@@ -95,6 +96,25 @@ function createOfferCatalog() {
   }
 }
 
+// The packaged products (ServicesGrid) sit in makesOffer rather than in the
+// tier OfferCatalog: they are bought or booked directly, not scoped, and the
+// catalog is meant to describe the three engagement tiers only. Prices live
+// with the payment provider, so these Offers carry a url and no price.
+function createProductOffers() {
+  return PRODUCTS.map((product) => ({
+    '@type': 'Offer',
+    name: product.title,
+    url: product.href,
+    itemOffered: {
+      '@type': 'Service',
+      name: product.title,
+      description: product.description,
+      serviceType: product.tag,
+      provider: { '@id': `${SITE_URL}/#organization` },
+    },
+  }))
+}
+
 // Home → page trail. Breadcrumbs are the one rich result still rendered by
 // Google among the markup on this site.
 function createBreadcrumb(path: string, name: string) {
@@ -138,8 +158,18 @@ function createHomeSchema() {
           availableLanguage: 'en',
         },
         areaServed: { '@type': 'Place', name: 'Worldwide' },
-        knowsAbout: ['AI automation', 'AI agents', 'Workflow automation', 'Enterprise AI'],
+        knowsAbout: [
+          'AI automation',
+          'AI agents',
+          'Workflow automation',
+          'Enterprise AI',
+          '3D visualization',
+          'Architectural rendering',
+          'AI companion apps',
+          'Data leak scanning',
+        ],
         hasOfferCatalog: createOfferCatalog(),
+        makesOffer: createProductOffers(),
         ...(SAME_AS.length === 0 ? {} : { sameAs: SAME_AS }),
       },
       {
@@ -264,6 +294,10 @@ export function usePageMetadata(path: string) {
     upsertMeta('meta[property="og:type"]', 'property', 'og:type', 'website')
     upsertMeta('meta[name="twitter:title"]', 'name', 'twitter:title', metadata.title)
     upsertMeta('meta[name="twitter:description"]', 'name', 'twitter:description', metadata.description)
+    // Every route shares one social image; re-asserting it keeps a client-side
+    // navigation from leaving a previous page's card image behind.
+    upsertMeta('meta[property="og:image"]', 'property', 'og:image', SOCIAL_IMAGE)
+    upsertMeta('meta[name="twitter:image"]', 'name', 'twitter:image', SOCIAL_IMAGE)
 
     const canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
     canonical?.setAttribute('href', canonicalUrl)

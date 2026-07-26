@@ -52,8 +52,9 @@ for (const [name, html] of [['homepage', homepage], ['imprint', imprint], ['faq'
 
 // Prerendered copy must reach the static HTML so non-JS crawlers see real content.
 check(homepage.includes('We build custom AI automations'), 'homepage prerenders the hero copy')
-check(homepage.includes('Liam and Marc met in Bali'), 'homepage prerenders the about copy')
+// About section is temporarily pulled from the page (see secret/About.tsx) — restore this check when it's back.
 check(homepage.includes('Small Projects.') && homepage.includes('Growth Projects.'), 'homepage prerenders the solutions cards')
+check(homepage.includes('Data Leak Scan') && homepage.includes('AI Companion Apps'), 'homepage prerenders the product cards')
 check(faq.includes('What services do you offer?'), 'faq prerenders its questions')
 check(imprint.includes('VAT number'), 'imprint prerenders its company details')
 
@@ -90,7 +91,7 @@ check(
   'every offer wraps a Service priced in EUR',
 )
 check(
-  [offers[0]?.priceSpecification?.maxPrice, offers[1]?.priceSpecification?.maxPrice, offers[2]?.priceSpecification?.minPrice].join(',') === '10000,30000,30000',
+  [offers[0]?.priceSpecification?.maxPrice, offers[1]?.priceSpecification?.maxPrice, offers[2]?.priceSpecification?.minPrice].join(',') === '10000,30000,5000',
   'offer prices match the tiers rendered on the page',
 )
 

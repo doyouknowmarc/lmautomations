@@ -117,7 +117,7 @@ export default function Features() {
         <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 lg:gap-5 lg:h-[480px]">
           <motion.div {...cardMotion(0)} className="h-full min-h-[320px]">
             <TiltCard>
-              <div className="relative rounded-2xl overflow-hidden h-full min-h-[320px] ring-1 ring-white/[0.06] transition-shadow duration-300 hover:ring-[#E1E0CC]/25 hover:shadow-[0_12px_48px_-16px_rgba(225,224,204,0.18)]">
+              <div className="group relative rounded-2xl overflow-hidden h-full min-h-[320px] ring-1 ring-white/[0.06] transition-shadow duration-300 hover:ring-[#E1E0CC]/25 hover:shadow-[0_12px_48px_-16px_rgba(225,224,204,0.18)]">
                 {/* Ambient zoom: the photo slowly drifts in and back out so the card feels alive. */}
                 <motion.div
                   className="absolute inset-0"
@@ -137,7 +137,7 @@ export default function Features() {
                       height="1672"
                       loading="lazy"
                       decoding="async"
-                      className="absolute inset-0 h-full w-full object-cover"
+                      className="absolute inset-0 h-full w-full object-cover object-top md:object-center transition-[filter] duration-500 group-hover:saturate-[1.15] group-hover:contrast-[1.05]"
                     />
                   </picture>
                 </motion.div>

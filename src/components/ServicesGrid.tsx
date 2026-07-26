@@ -62,7 +62,7 @@ export default function ServicesGrid() {
                 initial={{ opacity: 0, y: 50 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.8, delay: i * 0.15 }}
-                className="liquid-glass group block overflow-hidden rounded-3xl"
+                className="liquid-glass group block overflow-hidden rounded-3xl transition-shadow duration-500 hover:shadow-[0_12px_48px_-16px_rgba(225,224,204,0.25)]"
               >
                 <div className="relative aspect-video overflow-hidden">
                   {image ? (
@@ -71,7 +71,7 @@ export default function ServicesGrid() {
                       alt={product.imageAlt}
                       loading="lazy"
                       decoding="async"
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="h-full w-full object-cover transition-[transform,filter] duration-700 group-hover:scale-105 group-hover:saturate-[1.15] group-hover:contrast-[1.05]"
                     />
                   ) : (
                     <CardImagePlaceholder />

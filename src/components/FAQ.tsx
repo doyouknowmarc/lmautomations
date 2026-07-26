@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Check, ChevronDown } from 'lucide-react'
 import { FAQ_ITEMS, FAQItem } from '../content/faq'
-import { LAST_UPDATED_DISPLAY } from '../seo'
+import SiteFooter from './SiteFooter'
 
 const PANEL_EASE = [0.22, 1, 0.36, 1] as const
 
@@ -64,7 +64,7 @@ export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#101010] text-[#E1E0CC]">
+    <div className="flex min-h-[100svh] flex-col bg-[#101010] text-[#E1E0CC]">
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-20 md:py-28">
         <a
           href={import.meta.env.BASE_URL}
@@ -111,15 +111,9 @@ export default function FAQPage() {
         </div>
       </main>
 
-      <footer className="px-4 md:px-6">
-        <div className="mx-auto flex max-w-7xl items-center justify-between border-t border-white/10 py-6 text-[10px] text-[#DEDBC8]/55 sm:text-xs md:py-7">
-          <p>
-            lmautomations <span className="hidden sm:inline">· Focused systems. Measurable outcomes.</span>{' '}
-            <span className="text-[#DEDBC8]/40">· Last updated {LAST_UPDATED_DISPLAY}</span>
-          </p>
-          <span>FAQ</span>
-        </div>
-      </footer>
+      <SiteFooter tagline="Focused systems. Measurable outcomes." showLastUpdated>
+        <span>FAQ</span>
+      </SiteFooter>
     </div>
   )
 }

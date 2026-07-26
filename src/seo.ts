@@ -17,7 +17,8 @@ const SAME_AS: string[] = []
 // Bump DATE_MODIFIED whenever page content changes. This module is the only
 // source of the JSON-LD: scripts/prerender.mjs injects it into the built HTML.
 const DATE_PUBLISHED = '2026-07-18'
-const DATE_MODIFIED = '2026-07-26'
+// Exported so the footer's <time datetime> can carry the machine-readable form.
+export const DATE_MODIFIED = '2026-07-26'
 export const LAST_UPDATED_DISPLAY = 'July 26, 2026'
 
 interface PageMetadata {

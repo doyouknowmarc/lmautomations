@@ -98,7 +98,7 @@ export default function Features() {
   })
 
   return (
-    <section id="solutions" aria-labelledby="solutions-heading" className="relative min-h-[100dvh] bg-black px-4 md:px-6 py-16 md:py-24 overflow-hidden">
+    <section id="solutions" aria-labelledby="solutions-heading" className="relative min-h-[100svh] bg-black px-4 md:px-6 py-16 md:py-24 overflow-hidden">
       <div className="absolute inset-0 bg-noise opacity-[0.15] pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto">

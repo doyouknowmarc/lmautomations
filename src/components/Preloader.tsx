@@ -70,7 +70,9 @@ export default function Preloader({ onComplete }: PreloaderProps) {
   // Lock scrolling while the preloader owns the screen, and make sure the
   // page is at the very top so the hero starts in its idle-loop state.
   useEffect(() => {
-    window.scrollTo(0, 0)
+    // Explicitly instant: with scroll-behavior: smooth in play this would otherwise
+    // animate, and an animated scroll can still be running when the user first touches.
+    window.scrollTo({ top: 0, behavior: 'instant' })
     const root = document.documentElement
 
     // Hiding overflow removes the scrollbar, which would widen the page by the

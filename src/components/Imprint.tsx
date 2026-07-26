@@ -1,3 +1,5 @@
+import SiteFooter from './SiteFooter'
+
 const details = [
   {
     label: 'Business address',
@@ -17,7 +19,7 @@ const details = [
 
 export default function Imprint() {
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#101010] text-[#E1E0CC]">
+    <div className="flex min-h-[100svh] flex-col bg-[#101010] text-[#E1E0CC]">
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-20 md:py-28">
         <a
           href={import.meta.env.BASE_URL}
@@ -49,12 +51,9 @@ export default function Imprint() {
         </section>
       </main>
 
-      <footer className="px-4 md:px-6">
-        <div className="mx-auto flex max-w-7xl items-center justify-between border-t border-white/10 py-6 text-[10px] text-[#DEDBC8]/55 sm:text-xs md:py-7">
-          <p>lmautomations <span className="hidden sm:inline">· Focused systems. Measurable outcomes.</span></p>
-          <span>Imprint</span>
-        </div>
-      </footer>
+      <SiteFooter tagline="Focused systems. Measurable outcomes.">
+        <span>Imprint</span>
+      </SiteFooter>
     </div>
   )
 }

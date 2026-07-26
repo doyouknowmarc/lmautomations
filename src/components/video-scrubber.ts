@@ -6,12 +6,23 @@ export interface VideoScrubber {
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 const SEEK_EASING = 0.24
-const SETTLE_THRESHOLD = 0.002
+// Half a frame at 30fps. Anything finer cannot change the displayed frame, so a
+// smaller threshold just churns seeks the decoder has to service for nothing.
+const SETTLE_THRESHOLD = 0.016
+
+// Touch scrolling is already continuous, so easing only adds lag: the video visibly
+// trails the finger and keeps seeking after the gesture ends. A mouse wheel arrives
+// in discrete jumps, which is where the easing genuinely helps.
+const prefersEasedSeeking = () =>
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia('(pointer: fine)').matches
+    : true
 
 export function createVideoScrubber(video: HTMLVideoElement): VideoScrubber {
   let isStarted = false
   let targetTime = 0
   let animationFrame = 0
+  const useEasing = prefersEasedSeeking()
 
   const renderFrame = () => {
     if (!isStarted) return
@@ -21,6 +32,12 @@ export function createVideoScrubber(video: HTMLVideoElement): VideoScrubber {
     // (especially Android) unthrottled writes queue up and cause visible lag.
     if (video.seeking) {
       animationFrame = window.requestAnimationFrame(renderFrame)
+      return
+    }
+
+    if (!useEasing) {
+      if (video.currentTime !== targetTime) video.currentTime = targetTime
+      animationFrame = 0
       return
     }
 

@@ -14,28 +14,16 @@ import liamMarcMobileVideo from '../assets/liam-marc-video-mobile.mp4'
 //    video starts scrubbing. E.g., 100 means the video won't scrub for the first 100px.
 const SCROLL_START_OFFSET_PX = 0
 
-// 2. IDLE LOOP DURATION (in seconds):
-//    While the hero is at rest (page load, or scrolled back to the very top),
-//    only this opening window of the video loops, so the page stays visually
-//    alive without playing the whole animation. Keep it short (1-3s); scroll
-//    scrubbing takes over from here through to the end of the video.
-const IDLE_LOOP_DURATION_SECONDS = 0
-
-// 3. IDLE LOOP PLAYBACK RATE (0.25x-0.5x):
-//    Slowed down so the idle loop reads as subtle ambient motion rather than
-//    an obviously repeating clip.
-const IDLE_LOOP_PLAYBACK_RATE = 0.4
-
-// 4. CONTENT REVEAL TRIGGER PROGRESS (0.0 to 1.0):
-//    Once scroll scrubbing takes over (right after the idle loop window), the
-//    text reveal begins here.
+// 2. CONTENT REVEAL TRIGGER PROGRESS (0.0 to 1.0):
+//    Scroll position is the sole source of truth for the video; the text reveal
+//    begins at this point along the same 0..1 progress.
 const CONTENT_REVEAL_START_PROGRESS = 0.38
 
-// 5. CONTENT FULLY VISIBLE PROGRESS (0.0 to 1.0):
+// 3. CONTENT FULLY VISIBLE PROGRESS (0.0 to 1.0):
 //    The copy and CTA share this exact reveal window so they move as one unit.
 const CONTENT_REVEAL_END_PROGRESS = 0.47
 
-// 6. INITIAL STATE ON PAGE LOAD (before scrolling starts):
+// 4. INITIAL STATE ON PAGE LOAD (before scrolling starts):
 //    - To hide them on page load and have them ONLY slide in after scrubbing:
 //      Set CONTENT_INITIAL_Y = 100 and CONTENT_INITIAL_OPACITY = 0
 //    - To show them on page load, have them fade out on initial scroll, then slide
@@ -53,7 +41,6 @@ export default function Hero() {
   const shouldReduceMotion = useReducedMotion()
 
   // Create a motion value to track the current video scrubbing progress (from 0 to 1).
-  // Only meaningful once scroll scrubbing takes over; it sits at 0 during the idle loop.
   const scrubProgress = useMotionValue(0)
 
   // Copy and CTA deliberately share one transform. Keeping them in a single
@@ -80,152 +67,40 @@ export default function Hero() {
     }
 
     const scrubber = createVideoScrubber(video)
-
-    // State machine:
-    // - 'idle': the opening window plays as a *reverse loop* (forward, then backward, then
-    //   forward again) so there is never a hard jump cut. The forward leg uses native slow
-    //   playback (smooth); the backward leg is driven by gated seeks, since HTML video has
-    //   no native reverse playback.
-    // - 'scrubbing': the video never plays on its own; scroll position is the sole source of truth.
-    let mode: 'idle' | 'scrubbing' = 'idle'
     let scrollFrameId = 0
-    let idleLoopFrameId = 0
-    let lastFrameTs = 0
 
-    // Reverse-loop state. Position (seconds) and direction are preserved across a scrub
-    // excursion, so returning to the top resumes the loop exactly where it left off.
-    let reversePosition = 0
-    let idleDirection: 1 | -1 = 1
+    // The section's geometry is cached rather than read per scroll frame: touching
+    // offsetTop/offsetHeight inside the scroll handler forces a synchronous layout
+    // on every frame, which is exactly the work that stutters a sticky hero.
+    let sectionTop = 0
+    let scrollDistance = 0
 
-    // Video progress (0..1) where scrubbing began. Scroll maps [handoffProgress .. 1], so the
-    // scrub starts from wherever the idle loop currently is, and scrolling back up scrubs in
-    // reverse to that exact point before the idle loop takes over again.
-    let handoffProgress = 0
-
-    const idleLoopEndSeconds = () => (
-      Number.isFinite(video.duration) && video.duration > 0
-        ? Math.min(IDLE_LOOP_DURATION_SECONDS, video.duration)
-        : IDLE_LOOP_DURATION_SECONDS
-    )
-
-    const playIdleForward = () => {
-      idleDirection = 1
-      video.playbackRate = IDLE_LOOP_PLAYBACK_RATE
-      video.play().catch(() => {
-        // Autoplay blocked: the ambient loop won't animate until the user interacts.
-      })
-    }
-
-    const beginIdleReverse = () => {
-      idleDirection = -1
-      video.pause()
-      reversePosition = video.currentTime
-      lastFrameTs = 0
-    }
-
-    // Watches the loop bounds every frame. Forward motion is real (slow) playback; when the
-    // window's end is reached we flip into a seek-driven backward leg, and at 0 we flip back.
-    const runIdleLoop = (ts: number) => {
-      if (mode !== 'idle') return
-
-      if (idleDirection === 1) {
-        if (video.currentTime >= idleLoopEndSeconds()) {
-          beginIdleReverse()
-        }
-      } else {
-        if (!lastFrameTs) lastFrameTs = ts
-        // Clamp the frame delta so a background-tab pause can't cause a visible jump.
-        const deltaSeconds = Math.min((ts - lastFrameTs) / 1000, 0.1)
-        lastFrameTs = ts
-
-        reversePosition = Math.max(0, reversePosition - IDLE_LOOP_PLAYBACK_RATE * deltaSeconds)
-        // Only issue a new seek once the previous one has landed — overlapping seeks are
-        // what makes reverse playback look choppy.
-        if (!video.seeking) {
-          video.currentTime = reversePosition
-        }
-        if (reversePosition <= 0) {
-          playIdleForward()
-        }
-      }
-
-      idleLoopFrameId = requestAnimationFrame(runIdleLoop)
-    }
-
-    // Resumes/starts the reverse loop from a given time, keeping the current direction.
-    const startIdleLoop = (fromTime: number) => {
-      mode = 'idle'
-      scrubber.stop()
-      cancelAnimationFrame(idleLoopFrameId)
-
-      video.muted = true
-      const clamped = clamp(fromTime, 0, idleLoopEndSeconds())
-      video.currentTime = clamped
-
-      // idleDirection is intentionally preserved so the loop continues where it left off.
-      if (idleDirection === 1) {
-        playIdleForward()
-      } else {
-        video.pause()
-        reversePosition = clamped
-        lastFrameTs = 0
-      }
-
-      idleLoopFrameId = requestAnimationFrame(runIdleLoop)
-    }
-
-    const enterScrubbing = () => {
-      if (mode === 'scrubbing') return
-      mode = 'scrubbing'
-      cancelAnimationFrame(idleLoopFrameId)
-      // The exact point the idle loop is on right now becomes the scrub's origin.
-      handoffProgress = Number.isFinite(video.duration) && video.duration > 0
-        ? clamp(video.currentTime / video.duration, 0, 1)
-        : 0
-      scrubber.start(video.currentTime)
+    const measure = () => {
+      const section = sectionRef.current
+      if (!section) return
+      sectionTop = section.offsetTop
+      // Keep scrubbing while the sticky hero releases and travels out of view.
+      scrollDistance = section.offsetHeight
     }
 
     const seekToScrollPosition = () => {
-      const section = sectionRef.current
-      if (!section) return
-
-      const sectionTop = section.offsetTop
-      // Keep scrubbing while the sticky hero releases and travels out of view.
-      const scrollDistance = section.offsetHeight
       if (scrollDistance <= 0) return
 
       // --- ADAPT FROM WHERE VIDEO SCROLLING STARTS ---
-      // We calculate the active scroll amount relative to the section top and our configurable offset.
+      // Active scroll amount, relative to the section top and our configurable offset.
       const activeScrollY = window.scrollY - sectionTop - SCROLL_START_OFFSET_PX
       const activeScrollDistance = scrollDistance - SCROLL_START_OFFSET_PX
-      const atTop = activeScrollY <= 0
+      if (activeScrollDistance <= 0) return
 
-      if (atTop) {
-        // Back at the very top: the scrub has eased back to the handoff point. Hand control
-        // to the reverse loop, resuming from there and continuing in its preserved direction.
-        if (mode === 'scrubbing') {
-          startIdleLoop(video.currentTime)
-        }
-        return
-      }
-
-      if (mode === 'idle') {
-        enterScrubbing()
-      }
-
-      // Calculate scroll progress clamped between 0 and 1
-      const rawProgress = activeScrollDistance > 0
-        ? clamp(activeScrollY / activeScrollDistance, 0, 1)
-        : 0
-
-      // Map scroll progress from the handoff point through to the end of the video.
-      const videoProgress = handoffProgress + rawProgress * (1 - handoffProgress)
+      // Clamped, so an iOS rubber-band overscroll (negative scrollY) simply rests at
+      // frame zero instead of flipping the video into a different state.
+      const progress = clamp(activeScrollY / activeScrollDistance, 0, 1)
 
       // 1. Update the video scrubber
-      scrubber.seekToProgress(videoProgress)
+      scrubber.seekToProgress(progress)
 
       // 2. Update our motion value so the textbox and button parallax animate
-      scrubProgress.set(videoProgress)
+      scrubProgress.set(progress)
     }
 
     const scheduleSeek = () => {
@@ -236,23 +111,40 @@ export default function Hero() {
       })
     }
 
+    // Only a width change can alter the section's geometry now that it is sized in
+    // svh. Ignoring height-only resizes keeps iOS's collapsing URL bar — which fires
+    // resize continuously mid-scroll — from remapping scroll progress under the finger.
+    let lastWidth = window.innerWidth
+    const handleResize = () => {
+      if (window.innerWidth === lastWidth) return
+      lastWidth = window.innerWidth
+      measure()
+      seekToScrollPosition()
+    }
+
     const handleLoadedMetadata = () => {
-      startIdleLoop(0)
+      scrubber.start(0)
+      measure()
       // Sync immediately in case the page loaded already scrolled past the hero top.
       seekToScrollPosition()
     }
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata)
     window.addEventListener('scroll', scheduleSeek, { passive: true })
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('orientationchange', handleResize)
 
     if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
       handleLoadedMetadata()
+    } else {
+      measure()
     }
 
     return () => {
       video.removeEventListener('loadedmetadata', handleLoadedMetadata)
       window.removeEventListener('scroll', scheduleSeek)
-      cancelAnimationFrame(idleLoopFrameId)
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('orientationchange', handleResize)
       cancelAnimationFrame(scrollFrameId)
       scrubber.stop()
       video.pause()
@@ -260,7 +152,13 @@ export default function Hero() {
   }, [scrubProgress, shouldReduceMotion])
 
   return (
-    <section ref={sectionRef} aria-labelledby="hero-title" className={`${shouldReduceMotion ? 'h-[100dvh]' : 'h-[200dvh]'} bg-black p-4 md:p-6`}>
+    // The scroll track is sized in svh, not dvh, on purpose: dvh tracks iOS Safari's
+    // live viewport, so a collapsing URL bar would grow this section mid-gesture and
+    // shove every following section down under the user's finger.
+    <section ref={sectionRef} aria-labelledby="hero-title" className={`${shouldReduceMotion ? 'h-[100svh]' : 'h-[200svh]'} bg-black p-4 md:p-6`}>
+      {/* The card itself stays on dvh so it keeps filling the screen as the toolbar
+          collapses. Its height is not in flow (the parent's height is explicit), so
+          resizing it cannot move the page. */}
       <div className="sticky top-4 md:top-6 h-[calc(100dvh-2rem)] md:h-[calc(100dvh-3rem)] w-full rounded-2xl md:rounded-[2rem] overflow-hidden">
         <video
           ref={videoRef}
@@ -276,7 +174,11 @@ export default function Hero() {
           <source src={liamMarcMobileVideo} type="video/mp4" media="(max-width: 767px)" />
           <source src={liamMarcVideo} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 noise-overlay opacity-[0.45] mix-blend-overlay pointer-events-none" />
+        {/* Hidden outright on phones rather than merely un-blended: mix-blend-mode over a
+            seeking video inside a rounded clip drops the video off iOS's compositor fast
+            path, but without `overlay` this layer is a flat 45% grey wash that guts the
+            video's colour. No grain at all is both cheaper and truer to the footage. */}
+        <div className="hidden md:block absolute inset-0 noise-overlay opacity-[0.45] mix-blend-overlay pointer-events-none" />
 
         <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-6 md:px-10 pb-6 md:pb-10">
           <div className="grid grid-cols-12 gap-5 md:gap-8 items-end">
